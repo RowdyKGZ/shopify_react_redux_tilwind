@@ -1,10 +1,19 @@
+import { useDispatch, useSelector } from "react-redux";
+
 import { Error, Loader, SongCard } from "../components";
 import { genres } from "../assets/constants";
 import { useGetTopChartsQuery } from "../redux/services/shazamCore";
 
 const Discover = () => {
+  const dispatch = useDispatch();
+  const { activeSong, isPlaying } = useSelector((state) => state.player);
+
   const { data, isFetching, error } = useGetTopChartsQuery();
-  console.log(data);
+
+  if (isFetching) return <Loader title="Loading Song..." />;
+
+  if (error) return <Error />;
+
   const genreTitle = "Pop";
 
   return (
@@ -26,9 +35,16 @@ const Discover = () => {
         </select>
       </div>
 
-      <div className="flex felx-wrap sm:justify-start justify-center gap-8">
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((song, i) => (
-          <SongCard key={song} song={song} i={i} />
+      <div className="flex flex-wrap sm:justify-start justify-center gap-8">
+        {data?.tracks.map((song, i) => (
+          <SongCard
+            key={song.key}
+            song={song}
+            isPlaying={isPlaying}
+            activeSong={activeSong}
+            data={data}
+            i={i}
+          />
         ))}
       </div>
     </div>
